@@ -16,10 +16,11 @@ oc create -f mongo-replica-rs1.yaml
 #### 以下是三种测试方案：
 
 ##### 3-1.直接每个pod登录测试
+```
 oc rsh <podID1> bash
 oc rsh <podID2> bash
 oc rsh <podID3> bash
-
+```
 
 ##### 3-2.创新一个mongo客户端进行测试
 ```
@@ -58,3 +59,4 @@ db.auth('mongo','mongodbpass')
 ```
 
 二、mongodb sharding模式（正在测试中）
+

@@ -4,6 +4,8 @@
 ```
 cd replica-set
 docker build -t registry.dataos.io/liuliu/mongo-replica-20161010 .
+
+docker push  #push到私有镜像库
 ```
  
 ##### 1.修改mongo-replica-rs1.yaml中镜像地址(改成dockerfile的镜像地址)

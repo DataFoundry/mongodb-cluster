@@ -1,6 +1,7 @@
 # openshift mongodb 群集
 
 ### 一、replica-set模式：
+##### 1.build镜像
 ```
 cd replica-set
 docker build -t registry.dataos.io/liuliu/mongo-replica-20161010 .
@@ -8,23 +9,25 @@ docker build -t registry.dataos.io/liuliu/mongo-replica-20161010 .
 docker push  #push到私有镜像库
 ```
  
-##### 1.修改mongo-replica-rs1.yaml中镜像地址(改成dockerfile的镜像地址)
+##### 2.创建持久化卷（略）
 
-##### 2.创建mongodb replica-set群集编排
+##### 3.修改mongo-replica-rs1.yaml中镜像地址(改成dockerfile的镜像地址)和持久化卷名称
+
+##### 4.创建mongodb replica-set编排
 
 ```
 oc create -f mongo-replica-rs1.yaml
 ```
 #### 以下是三种测试方案：
 
-##### 3-1.直接每个pod登录测试
+##### 4-1.直接每个pod登录测试
 ```
 oc rsh <podID1> bash
 oc rsh <podID2> bash
 oc rsh <podID3> bash
 ```
 
-##### 3-2.创新一个mongo客户端进行测试
+##### 4-2.创新一个mongo客户端进行测试
 ```
 oc create -f mongo-client.yaml
 
@@ -33,7 +36,7 @@ oc rsh <podID> bash
 mongo  --host my_replica_set1/mongo-replica-nodea-0:27017,mongo-replica-nodea-1:27017,mongo-replica-nodea-2:27017 admin     #连接测试replica-set
 ```
 
-##### 3-3. 下面我就以node.js利用rrestjs框架 和 node-mongodb-native 模块进行mongodb副本集的操作（未实验）
+##### 4-3. 下面我就以node.js利用rrestjs框架 和 node-mongodb-native 模块进行mongodb副本集的操作（未实验）
 
 https://github.com/christkv/node-mongodb-native/blob/master/docs/replicaset.md
 

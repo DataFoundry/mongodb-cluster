@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-replica-nodea-0
+  name: mongo-replica-node-0
   labels:
-    name: mongo-svca
+    name: mongo-svc
 spec:
   clusterIP: None
   ports:
@@ -13,14 +13,14 @@ spec:
     protocol: TCP
     name: mongo-svc-port
   selector:
-    name: mongo-replica-nodea0
+    name: mongo-replica-node0
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-replica-nodea-1
+  name: mongo-replica-node-1
   labels:
-    name: mongo-svca
+    name: mongo-svc
 spec:
   clusterIP: None
   ports:
@@ -29,14 +29,14 @@ spec:
     protocol: TCP
     name: mongo-svc-port
   selector:
-    name: mongo-replica-nodea1
+    name: mongo-replica-node1
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-replica-nodea-2
+  name: mongo-replica-node-2
   labels:
-    name: mongo-svca
+    name: mongo-svc
 spec:
   clusterIP: None
   ports:
@@ -45,33 +45,33 @@ spec:
     protocol: TCP
     name: mongo-svc-port
   selector:
-    name: mongo-replica-nodea2
+    name: mongo-replica-node2
 ---
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-replica-rca1
+  name: mongo-replica-rc1
   labels:
-    name: mongo-replica-rca
+    name: mongo-replica-rc
 spec:
   replicas: 1
   selector:
-    name: mongo-replica-nodea0
+    name: mongo-replica-node0
   template:
     metadata:
       labels:
-        name: mongo-replica-nodea0
+        name: mongo-replica-node0
     spec:
       containers:
-      - name: mongo-replica-nodea0
+      - name: mongo-replica-node0
         image: registry.dataos.io/liuliu/mongo-replica-20161010
         env:
           - name: mongo_node_name
-            value: mongo-replica-nodea
+            value: mongo-replica-node
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_replica_set1
+            value: my_replica_set
         ports:
         - containerPort: 27017
         volumeMounts:
@@ -80,33 +80,33 @@ spec:
       volumes:
       - name: mongo-replica-storage0
         persistentVolumeClaim:
-          claimName: mongo-storage1-1
+          claimName: mongo-storage-1
 ---
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-replica-rca2
+  name: mongo-replica-rc2
   labels:
-    name: mongo-replica-rca
+    name: mongo-replica-rc
 spec:
   replicas: 1
   selector:
-    name: mongo-replica-nodea1
+    name: mongo-replica-node1
   template:
     metadata:
       labels:
-        name: mongo-replica-nodea1
+        name: mongo-replica-node1
     spec:
       containers:
-      - name: mongo-replica-nodea1
+      - name: mongo-replica-node1
         image: registry.dataos.io/liuliu/mongo-replica-20161010
         env:
           - name: mongo_node_name
-            value: mongo-replica-nodea
+            value: mongo-replica-node
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_replica_set1
+            value: my_replica_set
         ports:
         - containerPort: 27017
         volumeMounts:
@@ -115,34 +115,34 @@ spec:
       volumes:
       - name: mongo-replica-storage1
         persistentVolumeClaim:
-          claimName: mongo-storage1-2
+          claimName: mongo-storage-2
 
 ---
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-replica-rca3
+  name: mongo-replica-rc3
   labels:
-    name: mongo-replica-rca
+    name: mongo-replica-rc
 spec:
   replicas: 1
   selector:
-    name: mongo-replica-nodea2
+    name: mongo-replica-node2
   template:
     metadata:
       labels:
-        name: mongo-replica-nodea2
+        name: mongo-replica-node2
     spec:
       containers:
-      - name: mongo-replica-nodea2
+      - name: mongo-replica-node2
         image: registry.dataos.io/liuliu/mongo-replica-20161010
         env:
           - name: mongo_node_name
-            value: mongo-replica-nodea
+            value: mongo-replica-node
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_replica_set1
+            value: my_replica_set
         ports:
         - containerPort: 27017
         volumeMounts:
@@ -151,4 +151,4 @@ spec:
       volumes:
       - name: mongo-replica-storage2
         persistentVolumeClaim:
-          claimName: mongo-storage1-3
+          claimName: mongo-storage-3

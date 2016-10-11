@@ -13,9 +13,11 @@ if [ ! -z "$mongo_node_name" ] && [ ! -z "$mongo_replica_set_name" ]; then
   content="$content $mongo_members]});"
   # create the mongo-shell file: replica_init.js
   echo $content > replica_init.js
-  # important
-  sleep 15
+
   mongod --replSet $mongo_replica_set_name &
+  sleep 50
+  mongod --smallfiles --configsvr &
+
   until nc -z localhost 27017
   do
       echo "Wait mongoDB to be ready"

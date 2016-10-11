@@ -1,5 +1,5 @@
 # mongo-cluster
-# replica-set part
+# configsvr part
 FROM mongo:latest
 
 EXPOSE 27017

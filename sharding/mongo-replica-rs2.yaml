@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodeb0
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodeb
@@ -79,7 +79,10 @@ spec:
           mountPath: /data/db
       volumes:
       - name: mongo-replica-storage0
-        emptyDir: {}
+#        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: mongo-storage2-1
+
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -98,7 +101,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodeb1
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodeb
@@ -113,7 +116,10 @@ spec:
           mountPath: /data/db
       volumes:
       - name: mongo-replica-storage1
-        emptyDir: {}
+#        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: mongo-storage2-2
+
 ---
 apiVersion: v1
 kind: ReplicationController
@@ -132,7 +138,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodeb2
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodeb
@@ -147,4 +153,6 @@ spec:
           mountPath: /data/db
       volumes:
       - name: mongo-replica-storage2
-        emptyDir: {}
+#        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: mongo-storage2-3

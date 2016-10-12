@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodec0
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodec
@@ -98,7 +98,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodec1
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodec
@@ -132,7 +132,7 @@ spec:
     spec:
       containers:
       - name: mongo-replica-nodec2
-        image: registry.dataos.io/liuliu/mongo-replica-20161010
+        image: registry.dataos.io/liuliu/mongod-replica-set:3.2.10
         env:
           - name: mongo_node_name
             value: mongo-replica-nodec

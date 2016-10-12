@@ -15,7 +15,7 @@ if [ ! -z "$mongo_node_name" ] && [ ! -z "$mongo_replica_set_name" ]; then
   echo $content > replica_init.js
 
   mongod --replSet $mongo_replica_set_name &
-  sleep 50
+  sleep 30
   mongod --smallfiles --configsvr &
 
   until nc -z localhost 27017

@@ -1,4 +1,4 @@
-# openshift mongodb 群集
+# openshift kubernetes mongodb cluster(sharding replica-set)
 
 ### 一、replica-set模式：
 ##### 1.build镜像
@@ -13,10 +13,12 @@ docker push  #push到私有镜像库
 
 ##### 3.修改mongo-replica-rs1.yaml中镜像地址(改成dockerfile的镜像地址)和持久化卷名称
 
-##### 4.创建mongodb replica-set编排
+##### 4.创建mongodb replica-set编排，以下选其一即可。
 
 ```
-oc create -f mongo-replica-rs1.yaml
+oc create -f mongo-replica-rs1.yaml  #持久化卷
+
+oc create -f mongo-replica-not-storage.yaml  #未持久化
 ```
 #### 以下是三种测试方案：
 
@@ -41,7 +43,7 @@ mongo  --host my_replica_set1/mongo-replica-nodea-0:27017,mongo-replica-nodea-1:
 https://github.com/christkv/node-mongodb-native/blob/master/docs/replicaset.md
 
 
-### 会使用到的测试命令：
+##### 5.会使用到的测试命令：
 
 ```
 #先进入设置账号密码的库
@@ -63,5 +65,120 @@ db.auth('mongo','mongodbpass')
 
 ```
 
-二、mongodb sharding模式（正在测试中）
+### 二、mongodb sharding模式
+##### 1.编排描述：
+1.1 按照以下步骤将会起11个pod，其中shard部分两个replica-set副本集占6个，config部分3个pod（也是replica-set模式），route部分2个pod
+
+1.2 架构图（以下操作流程只起shard1和shard2）
+![image](https://github.com/asiainfoLDP/mongodb-cluster/blob/master/mongodb-sharding图示.png)
+
+1.3 新建三个dockerfile并替换相应文件的镜像源，例子：
+
+```
+关键镜像：
+registry.dataos.io/liuliu/mongod-replica-set:3.2.10    #replica-set副本集部分
+registry.dataos.io/liuliu/mongos:3.2.10          #mongos route部分
+registry.dataos.io/liuliu/mongodb-configsvr:3.2.10   #config部分
+
+```
+
+1.4 持久化卷占用(GlustFS),以下为卷名:
+
+```
+mongo-conf-storage-1 --    
+mongo-conf-storage-2   |   ----> config节点 /data 目录            
+mongo-conf-storage-3 --
+
+
+mongo-storage1-1 --       
+mongo-storage1-2   |    ----> shard1 /data/db 目录
+mongo-storage1-3 --
+
+
+mongo-storage2-1 --       
+mongo-storage2-2   |    ----> shard2 /data/db 目录  
+mongo-storage2-3 --
+```
+
+##### 2.创建config配置节点（replica-set模式）
+
+```
+oc create -f mongo-configsvr.yaml  #执行此步需要等待1分钟左右，等待三个pod同时启动、初始化mongodb数据库、设置replica-set和设置configsvr，之后再做下一步操作。
+```
+
+##### 3. 创建路由节点，用于对mongodb群集的访问（负载均衡模式）
+
+```
+oc create -f mongo-route-with-SLB.yaml 
+```
+##### 4. 创建两个shard分片群集（replica-set模式）
+```
+oc create -f mongo-replica-rs1.yaml   #shard1
+oc create -f mongo-replica-rs2.yaml   #shard2
+
+# 等待以上6个pod正常启动后，等待1分钟初始化mongodb群集，之后进行以下操作
+```
+
+##### 5. 添加shard1 和 shard2 到 sharding群集
+```
+oc rsh <MONGO_ROUTE_POD:ID> bash   # 登录任意一个route节点
+
+mongo   #登录mongo数据库
+
+mongos> sh.addShard("my_replica_set1/mongo-replica-nodea-0:27017"); #添加shard1
+
+mongos> sh.addShard("my_replica_set2/mongo-replica-nodeb-1:27017"); #添加shard2
+
+```
+
+##### 6.将test库设置成分片方式
+
+```
+use admin
+
+db.runCommand({enablesharding:"test"});    #使能test库分片
+sh.enableSharding("test");   #同上，执行其一即可
+
+sh.shardCollection("test.users", { "_id": "hashed" })    #test.users表进行分片处理
+db.runCommand({shardcollection:"test.users",key:{_id:1}})    #同上，执行其一即可
+
+sh.status()    #分片群集状态查询
+
+```
+
+##### 7.验证Sharding 正常工作
+
+7.1 数据插入测试
+
+```
+use test
+for(var i=1;i<2000;i++)db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});
+db.users.status()  #查看是否分片
+db.users.find()  #查看所有数据
+it   #显示更多
+
+test.test1插入100条数据
+sh.shardCollection("test.test1", { "_id": "hashed" })
+for(var i=1;i<100;i++)db.test1.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});
+db.test1.status()  #查看是否分片
+db.test1.find()  #查看所有数据
+it   #显示更多
+
+```
+
+7.2 其他验证方法：
+分别登录shard1和shard2测试数据是否分片存储
+```
+mongo
+
+use test
+db.test1.find() 
+it
+```
+
+##### 8.问题处理：
+如果出现添加shard1 和shard2 无法添加到群集的现象：
+```
+oc delete pod `oc get pod | grep 'mongo-replica-rc'| awk '{print $1}' `    # 删除shard 的pod 重新生成即可
+
 

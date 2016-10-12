@@ -93,6 +93,7 @@ spec:
         - containerPort: 27017
         volumeMounts:
         - name: mongo-replica-storage0
+          # /data/configdb and /data/db
           mountPath: /data
       volumes:
       - name: mongo-replica-storage0
@@ -134,6 +135,7 @@ spec:
         - containerPort: 27017
         volumeMounts:
         - name: mongo-replica-storage1
+          # /data/configdb and /data/db
           mountPath: /data
       volumes:
       - name: mongo-replica-storage1
@@ -176,6 +178,7 @@ spec:
         - containerPort: 27017
         volumeMounts:
         - name: mongo-replica-storage2
+          # /data/configdb and /data/db
           mountPath: /data
       volumes:
       - name: mongo-replica-storage2

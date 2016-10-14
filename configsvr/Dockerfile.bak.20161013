@@ -9,10 +9,6 @@ RUN mkdir -p /opt/mongo/ && \
 
 COPY start_replica.sh /opt/mongo/
 
-RUN chown -R root.root /data
-
-VOLUME /data
-
 WORKDIR /opt/mongo
 
 CMD /opt/mongo/start_replica.sh

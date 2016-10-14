@@ -1,5 +1,8 @@
 # openshift kubernetes mongodb cluster(sharding replica-set)
 
+
+==如果是openshift平台可直接使用，kubernetes平台的话，针对编排做相应的修改==
+
 ### 一、replica-set模式：
 ##### 1.build镜像
 ```
@@ -82,12 +85,17 @@ registry.dataos.io/liuliu/mongodb-configsvr:3.2.10   #config部分
 
 ```
 
-1.4 持久化卷占用(GlustFS),以下为卷名:
+1.4 持久化卷占用(GlustFS),以下为卷名（创建略）:
 
 ```
 mongo-conf-storage-1 --    
-mongo-conf-storage-2   |   ----> config节点 /data 目录            
+mongo-conf-storage-2   |   ----> config节点 /data/configdb 配置文件目录            
 mongo-conf-storage-3 --
+
+
+mongo-config-db-1 --    
+mongo-config-db-2   |   ----> config节点 /data/db 数据库目录            
+mongo-config-db-3 --
 
 
 mongo-storage1-1 --       
@@ -153,14 +161,14 @@ sh.status()    #分片群集状态查询
 ```
 use test
 for(var i=1;i<2000;i++)db.users.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});
-db.users.status()  #查看是否分片
+db.users.stats()  #查看是否分片
 db.users.find()  #查看所有数据
 it   #显示更多
 
 test.test1插入100条数据
 sh.shardCollection("test.test1", { "_id": "hashed" })
 for(var i=1;i<100;i++)db.test1.insert({id:i,addr_1:"Beijing",addr_2:"Shanghai"});
-db.test1.status()  #查看是否分片
+db.test1.stats()  #查看是否分片
 db.test1.find()  #查看所有数据
 it   #显示更多
 
@@ -176,9 +184,30 @@ db.test1.find()
 it
 ```
 
+8.3 持久化存储验证：
+
+```
+oc delete pod `oc get pod | grep 'mongo-config' | awk '{print $1}'` #删除配置节点
+
+
+```
+
 ##### 8.问题处理：
-如果出现添加shard1 和shard2 无法添加到群集的现象：
+1 如果出现添加shard1 和shard2 无法添加到群集的现象：
 ```
 oc delete pod `oc get pod | grep 'mongo-replica-rc'| awk '{print $1}' `    # 删除shard 的pod 重新生成即可
+```
 
+2 configsvr 部分：
+
+```
+config节点需要将以下两个路径持久化
+/data/configdb
+/data/db
+不要直接持久化/data/，因为属主属组等问题，会导致数据不能持久化。
+```
+
+3 如果涉及的服务节点中所有的pod全部删除，服务无法正常启动，将两个shard1和shard2重启即可。
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

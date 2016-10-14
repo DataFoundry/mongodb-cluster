@@ -2,93 +2,88 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-configsvc-0
+  name: mongo-replica-nodec-0
   labels:
-    name: mongo-svca
+    name: mongo-svcc
 spec:
   clusterIP: None
   ports:
-  - name: mongo-svc-port
-    port: 27017
-    protocol: TCP
+  - port: 27017
     targetPort: 27017
-  - name: mongo-config-port
-    port: 27019
     protocol: TCP
+    name: mongo-svc-port
+    port: 27019
     targetPort: 27019
+    protocol: TCP
+    name: mongo-config-port
   selector:
-    name: mongo-configsvc0
+    name: mongo-replica-nodec0
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-configsvc-1
+  name: mongo-replica-nodec-1
   labels:
-    name: mongo-svca
+    name: mongo-svcc
 spec:
   clusterIP: None
   ports:
-  - name: mongo-svc-port
-    port: 27017
-    protocol: TCP
+  - port: 27017
     targetPort: 27017
-  - name: mongo-config-port
-    port: 27019
     protocol: TCP
+    name: mongo-svc-port
+    port: 27019
     targetPort: 27019
+    protocol: TCP
+    name: mongo-config-port
   selector:
-    name: mongo-configsvc1
+    name: mongo-replica-nodec1
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo-configsvc-2
+  name: mongo-replica-nodec-2
   labels:
-    name: mongo-svca
+    name: mongo-svcc
 spec:
   clusterIP: None
   ports:
-  - name: mongo-svc-port
-    port: 27017
-    protocol: TCP
+  - port: 27017
     targetPort: 27017
-  - name: mongo-config-port
-    port: 27019
     protocol: TCP
+    name: mongo-svc-port
+    port: 27019
     targetPort: 27019
+    protocol: TCP
+    name: mongo-config-port
   selector:
-    name: mongo-configsvc2
+    name: mongo-replica-nodec2
 ---
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-configsvc-rc1
+  name: mongo-replica-rcc1
   labels:
-    name: mongo-configsvc-rc
+    name: mongo-replica-rcc
 spec:
   replicas: 1
   selector:
-    name: mongo-configsvc0
+    name: mongo-replica-nodec0
   template:
     metadata:
       labels:
-        name: mongo-configsvc0
+        name: mongo-replica-nodec0
     spec:
       containers:
-      - name: mongo-configsvc0
-        image: registry.dataos.io/liuliu/mongodb-configsvr:3.2.10 
+      - name: mongo-replica-nodec0
+        image: registry.dataos.io/liuliu/mongo-test
         env:
           - name: mongo_node_name
-            value: mongo-configsvc
+            value: mongo-replica-nodec
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_configsvr
-#        command:
-#        - mongod
-#        - "--configsvr"
-#        - "--replSet"
-#        - configReplSet
+            value: my_replica_set3
         ports:
         - containerPort: 27017
         volumeMounts:
@@ -109,37 +104,31 @@ spec:
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-configsvc-rc2
+  name: mongo-replica-rcc2
   labels:
-    name: mongo-configsvc-rc
+    name: mongo-replica-rcc
 spec:
   replicas: 1
   selector:
-    name: mongo-configsvc1
+    name: mongo-replica-nodec1
   template:
     metadata:
       labels:
-        name: mongo-configsvc1
+        name: mongo-replica-nodec1
     spec:
       containers:
-      - name: mongo-configsvc1
-        image: registry.dataos.io/liuliu/mongodb-configsvr:3.2.10
+      - name: mongo-replica-nodec1
+        image: registry.dataos.io/liuliu/mongo-test
         env:
           - name: mongo_node_name
-            value: mongo-configsvc
+            value: mongo-replica-nodec
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_configsvr 
-#        command:
-#        - mongod
-#        - "--configsvr"
-#        - "--replSet"
-#        - configReplSet
+            value: my_replica_set3
         ports:
         - containerPort: 27017
         volumeMounts:
-          # /data/configdb and /data/db
         - name: mongo-replica-storage0
           mountPath: /data/db
         - name: mongo-replica-storage1
@@ -153,41 +142,34 @@ spec:
           claimName: mongo-conf-storage-2
 
 ---
-
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: mongo-configsvc-rc3
+  name: mongo-replica-rcc3
   labels:
-    name: mongo-configsvc-rc
+    name: mongo-replica-rcc
 spec:
   replicas: 1
   selector:
-    name: mongo-configsvc2
+    name: mongo-replica-nodec2
   template:
     metadata:
       labels:
-        name: mongo-configsvc2
+        name: mongo-replica-nodec2
     spec:
       containers:
-      - name: mongo-configsvc2
-        image: registry.dataos.io/liuliu/mongodb-configsvr:3.2.10
+      - name: mongo-replica-nodec2
+        image: registry.dataos.io/liuliu/mongo-test
         env:
           - name: mongo_node_name
-            value: mongo-configsvc
+            value: mongo-replica-nodec
           - name: mongo_nodes_number
             value: "3"
           - name: mongo_replica_set_name
-            value: my_configsvr
-#        command:
-#        - mongod
-#        - "--configsvr"
-#        - "--replSet"
-#        - configReplSet
+            value: my_replica_set3
         ports:
         - containerPort: 27017
         volumeMounts:
-          # /data/configdb and /data/db
         - name: mongo-replica-storage0
           mountPath: /data/db
         - name: mongo-replica-storage1
@@ -199,4 +181,3 @@ spec:
       - name: mongo-replica-storage1
         persistentVolumeClaim:
           claimName: mongo-conf-storage-3
-

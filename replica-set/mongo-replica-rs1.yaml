@@ -65,6 +65,9 @@ spec:
       containers:
       - name: mongo-replica-node0
         image: registry.dataos.io/liuliu/mongo-replica-20161010
+        livenessProbe:
+          tcpSocket:
+            port: 27017
         env:
           - name: mongo_node_name
             value: mongo-replica-node
@@ -100,6 +103,9 @@ spec:
       containers:
       - name: mongo-replica-node1
         image: registry.dataos.io/liuliu/mongo-replica-20161010
+        livenessProbe:
+          tcpSocket:
+            port: 27017
         env:
           - name: mongo_node_name
             value: mongo-replica-node
@@ -136,6 +142,11 @@ spec:
       containers:
       - name: mongo-replica-node2
         image: registry.dataos.io/liuliu/mongo-replica-20161010
+        livenessProbe:
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+          tcpSocket:
+            port: 27017
         env:
           - name: mongo_node_name
             value: mongo-replica-node

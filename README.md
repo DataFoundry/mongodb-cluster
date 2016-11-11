@@ -38,7 +38,7 @@ oc create -f mongo-client.yaml
 
 oc rsh <podID> bash
 
-mongo  --host my_replica_set1/mongo-replica-nodea-0:27017,mongo-replica-nodea-1:27017,mongo-replica-nodea-2:27017 admin     #连接测试replica-set
+mongo  --host my_replica_set/mongo-replica-nodea-0:27017,mongo-replica-nodea-1:27017,mongo-replica-nodea-2:27017 admin     #连接测试replica-set
 ```
 
 ##### 4-3. 下面我就以node.js利用rrestjs框架 和 node-mongodb-native 模块进行mongodb副本集的操作（未实验）
